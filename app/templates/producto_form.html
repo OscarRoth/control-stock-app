@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Nuevo producto</h2>
+
+<form method="post">
+    <label>SKU:</label><br>
+    <input type="text" name="sku" required><br><br>
+
+    <label>Nombre:</label><br>
+    <input type="text" name="name" required><br><br>
+
+    <label>Stock inicial:</label><br>
+    <input type="number" name="stock" value="0" min="0" required><br><br>
+
+    <button type="submit">Guardar</button>
+</form>
+{% endblock %}						

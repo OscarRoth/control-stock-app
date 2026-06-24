@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Stock</title>
+</head>
+
+<body>
+    <h1>Sistema de Stock</h1>
+
+    <nav>
+        <a href="/">Inicio</a> |
+        <a href="/productos">Productos</a>
+
+        {% if current_user.role == "admin" %}
+        | <a href="/productos/nuevo">Nuevo producto</a>
+        {% endif %}
+
+        {% if current_user.role in ["admin", "operador"] %}
+        | <a href="/movimientos">Movimientos</a>
+        {% endif %}
+
+        {% if current_user.role in ["admin", "consulta"] %}
+        | <a href="/historial">Historial</a>
+        | <a href="/exportar/productos">Exportar CSV</a>
+        {% endif %}
+
+        | <a href="/logout">Salir</a>
+    </nav>
+
+    <hr>
+
+    {% if content %}
+    {{ content|safe }}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Registrar Movimiento</h2>
+
+<form method="post">
+
+    <label>Producto:</label><br>
+
+    <select name="product_id">
+        {% for p in products %}
+            <option value="{{ p.id }}">
+                {{ p.name }} (Stock: {{ p.stock }})
+            </option>
+        {% endfor %}
+    </select>
+
+    <br><br>
+
+    <label>Tipo:</label><br>
+
+    <select name="movement_type">
+        <option value="ingreso">Ingreso</option>
+        <option value="egreso">Egreso</option>
+    </select>
+
+    <br><br>
+
+    <label>Cantidad:</label><br>
+
+    <input type="number" name="quantity" min="1" required>
+
+    <br><br>
+
+    <button type="submit">
+        Registrar
+    </button>
+
+</form>
+{% endblock %}

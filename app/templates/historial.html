@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Historial de Movimientos</h2>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>ID</th>
+        <th>Producto</th>
+        <th>Tipo</th>
+        <th>Cantidad</th>
+        <th>Usuario</th>
+        <th>Fecha</th>
+    </tr>
+
+    {% for m in movements %}
+    <tr>
+        <td>{{ m.id }}</td>
+        <td>{{ m.product.name }}</td>
+        <td>{{ m.movement_type }}</td>
+        <td>{{ m.quantity }}</td>
+        <td>{{ m.username }}</td>
+        <td>{{ m.created_at }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+{% endblock %}
