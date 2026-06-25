@@ -1,40 +1,124 @@
 {% extends "base.html" %}
 
+{% block title %}Movimientos | Control Stock{% endblock %}
+{% block page_title %}Registrar movimiento{% endblock %}
+{% block page_subtitle %}Entrada y salida de productos del inventario{% endblock %}
+
 {% block content %}
-<h2>Registrar Movimiento</h2>
 
-<form method="post">
+<section class="grid gap-6 xl:grid-cols-[1fr_360px]">
 
-    <label>Producto:</label><br>
+    <!-- Formulario principal -->
+    <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-200 px-6 py-5">
+            <h2 class="text-base font-semibold text-slate-900">
+                Nuevo movimiento
+            </h2>
+            <p class="mt-1 text-sm text-slate-500">
+                Selecciona un producto, define el tipo de operación y registra la cantidad.
+            </p>
+        </div>
 
-    <select name="product_id">
-        {% for p in products %}
-            <option value="{{ p.id }}">
-                {{ p.name }} (Stock: {{ p.stock }})
-            </option>
-        {% endfor %}
-    </select>
+        <form method="post" class="space-y-6 px-6 py-6">
 
-    <br><br>
+            <div>
+                <label for="product_id" class="block text-sm font-medium text-slate-700">
+                    Producto
+                </label>
 
-    <label>Tipo:</label><br>
+                <select id="product_id" name="product_id" required
+                    class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 shadow-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
+                    {% for p in products %}
+                    <option value="{{ p.id }}">
+                        {{ p.name }} · SKU {{ p.sku }} · Stock {{ p.stock }}
+                    </option>
+                    {% endfor %}
+                </select>
 
-    <select name="movement_type">
-        <option value="ingreso">Ingreso</option>
-        <option value="egreso">Egreso</option>
-    </select>
+                <p class="mt-2 text-xs text-slate-500">
+                    El movimiento se aplicará directamente sobre el stock actual.
+                </p>
+            </div>
 
-    <br><br>
+            <div>
+                <label for="movement_type" class="block text-sm font-medium text-slate-700">
+                    Tipo de movimiento
+                </label>
 
-    <label>Cantidad:</label><br>
+                <select id="movement_type" name="movement_type" required
+                    class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 shadow-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
+                    <option value="ingreso">Ingreso de stock</option>
+                    <option value="egreso">Egreso de stock</option>
+                </select>
 
-    <input type="number" name="quantity" min="1" required>
+                <p class="mt-2 text-xs text-slate-500">
+                    Los egresos descuentan unidades. El sistema evita egresos con stock insuficiente.
+                </p>
+            </div>
 
-    <br><br>
+            <div>
+                <label for="quantity" class="block text-sm font-medium text-slate-700">
+                    Cantidad
+                </label>
 
-    <button type="submit">
-        Registrar
-    </button>
+                <input id="quantity" type="number" name="quantity" min="1" required placeholder="Ej: 10"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-3 text-sm text-slate-900 shadow-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600">
 
-</form>
+                <p class="mt-2 text-xs text-slate-500">
+                    Ingresa únicamente números enteros mayores a cero.
+                </p>
+            </div>
+
+            <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-end">
+                <a href="{{ url_for('main.productos') }}"
+                    class="inline-flex justify-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Cancelar
+                </a>
+
+                <button type="submit"
+                    class="inline-flex justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700">
+                    Registrar movimiento
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Panel lateral -->
+    <aside class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-slate-900">
+            Criterios operativos
+        </h3>
+
+        <div class="mt-5 space-y-4 text-sm">
+            <div class="rounded-lg bg-blue-50 px-4 py-3">
+                <div class="font-medium text-blue-700">
+                    Ingreso
+                </div>
+                <p class="mt-1 text-blue-700/80">
+                    Suma unidades al inventario del producto seleccionado.
+                </p>
+            </div>
+
+            <div class="rounded-lg bg-amber-50 px-4 py-3">
+                <div class="font-medium text-amber-700">
+                    Egreso
+                </div>
+                <p class="mt-1 text-amber-700/80">
+                    Descuenta unidades y requiere stock disponible suficiente.
+                </p>
+            </div>
+
+            <div class="rounded-lg bg-slate-50 px-4 py-3">
+                <div class="font-medium text-slate-700">
+                    Auditoría
+                </div>
+                <p class="mt-1 text-slate-500">
+                    Cada movimiento se registra con usuario y fecha en el historial.
+                </p>
+            </div>
+        </div>
+    </aside>
+
+</section>
+
 {% endblock %}

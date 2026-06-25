@@ -1,18 +1,148 @@
 {% extends "base.html" %}
 
+{% block title %}Nuevo Producto{% endblock %}
+{% block page_title %}Nuevo producto{% endblock %}
+{% block page_subtitle %}Alta de un nuevo artículo en el inventario{% endblock %}
+
 {% block content %}
-<h2>Nuevo producto</h2>
 
-<form method="post">
-    <label>SKU:</label><br>
-    <input type="text" name="sku" required><br><br>
+<div class="max-w-5xl mx-auto">
 
-    <label>Nombre:</label><br>
-    <input type="text" name="name" required><br><br>
+    <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
 
-    <label>Stock inicial:</label><br>
-    <input type="number" name="stock" value="0" min="0" required><br><br>
+        <div class="border-b border-slate-200 px-6 py-5">
 
-    <button type="submit">Guardar</button>
-</form>
-{% endblock %}						
+            <h2 class="text-lg font-semibold text-slate-900">
+                Información del producto
+            </h2>
+
+            <p class="mt-1 text-sm text-slate-500">
+                Complete los datos básicos del producto para incorporarlo al inventario.
+            </p>
+
+        </div>
+
+        <form method="post" class="p-6">
+
+            <div class="grid gap-6 md:grid-cols-2">
+
+                <!-- SKU -->
+
+                <div>
+
+                    <label class="block text-sm font-medium text-slate-700">
+                        SKU
+                    </label>
+
+                    <input type="text" name="sku" required placeholder="Ej: FIL-000125"
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+
+                    <p class="mt-2 text-xs text-slate-500">
+                        Código interno único del producto.
+                    </p>
+
+                </div>
+
+                <!-- Stock -->
+
+                <div>
+
+                    <label class="block text-sm font-medium text-slate-700">
+                        Stock inicial
+                    </label>
+
+                    <input type="number" name="stock" value="0" min="0" required
+                        class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+
+                    <p class="mt-2 text-xs text-slate-500">
+                        Cantidad disponible al momento del alta.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- Nombre -->
+
+            <div class="mt-6">
+
+                <label class="block text-sm font-medium text-slate-700">
+                    Nombre del producto
+                </label>
+
+                <input type="text" name="name" required placeholder="Ej: Filtro de Habitáculo Iveco Daily"
+                    class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+
+                <p class="mt-2 text-xs text-slate-500">
+                    Utilice una descripción clara y completa.
+                </p>
+
+            </div>
+
+            <!-- Vista previa -->
+
+            <div class="mt-8 rounded-xl bg-slate-50 p-5">
+
+                <h3 class="font-medium text-slate-800">
+                    Próximamente
+                </h3>
+
+                <p class="mt-2 text-sm text-slate-500">
+
+                    Este formulario está preparado para incorporar nuevos campos como:
+
+                </p>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+
+                    <span class="rounded-full bg-white px-3 py-1 text-xs border">
+                        Marca
+                    </span>
+
+                    <span class="rounded-full bg-white px-3 py-1 text-xs border">
+                        Categoría
+                    </span>
+
+                    <span class="rounded-full bg-white px-3 py-1 text-xs border">
+                        Ubicación
+                    </span>
+
+                    <span class="rounded-full bg-white px-3 py-1 text-xs border">
+                        Código OEM
+                    </span>
+
+                    <span class="rounded-full bg-white px-3 py-1 text-xs border">
+                        Stock mínimo
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- Botones -->
+
+            <div class="mt-8 flex justify-end gap-3">
+
+                <a href="{{ url_for('main.productos') }}"
+                    class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+
+                    Cancelar
+
+                </a>
+
+                <button type="submit"
+                    class="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700">
+
+                    Guardar producto
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

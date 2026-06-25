@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% from "components.html" import card, button, badge %}
+
+{% block title %}Dashboard | Control Stock{% endblock %}
+{% block page_title %}Panel de control{% endblock %}
+{% block page_subtitle %}Resumen operativo del inventario{% endblock %}
+
+{% block content %}
+<section class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+    {{ card("Productos", products_count, "Registrados en inventario", "info") }}
+    {{ card("Movimientos", movements_count, "Operaciones registradas", "success") }}
+    {{ card("Stock bajo", stock_bajo_count, "Requieren reposición", "warning") }}
+    {{ card("Sin stock", sin_stock_count, "No disponibles", "danger") }}
+
+
+</section>
+
+<section class="mt-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+            <h2 class="text-base font-semibold text-slate-900">Acciones rápidas</h2>
+            <p class="mt-1 text-sm text-slate-500">Operaciones frecuentes del sistema</p>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+            {% if current_user.can_manage_products %}
+            {{ button("Nuevo producto", url_for("main.nuevo_producto")) }}
+            {% endif %}
+            {% if current_user.can_move_stock %}
+            {{ button("Registrar movimiento", url_for("main.movimientos"), "secondary") }}
+            {% endif %}
+        </div>
+    </div>
+</section>
+<section class="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-6 py-5">
+        <h2 class="text-base font-semibold text-slate-900">
+            Últimos movimientos
+        </h2>
+        <p class="mt-1 text-sm text-slate-500">
+            Actividad reciente del inventario.
+        </p>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">Producto</th>
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">Tipo</th>
+                    <th class="px-5 py-3 text-center font-medium text-slate-500">Cantidad</th>
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">Usuario</th>
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">Fecha</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-slate-100 bg-white">
+                {% for m in ultimos_movimientos %}
+                <tr class="hover:bg-slate-50">
+                    <td class="px-5 py-4">
+                        <div class="font-medium text-slate-900">
+                            {{ m.product.name }}
+                        </div>
+                        <div class="text-xs text-slate-500">
+                            ID {{ m.product.id }}
+                        </div>
+                    </td>
+
+                    <td class="px-5 py-4">
+                        {% if m.movement_type == "ingreso" %}
+                        {{ badge("Ingreso", "success") }}
+                        {% else %}
+                        {{ badge("Egreso", "danger") }}
+                        {% endif %}
+                    </td>
+
+                    <td class="px-5 py-4 text-center">
+                        <span class="font-semibold text-slate-900">
+                            {{ m.quantity }}
+                        </span>
+                    </td>
+
+                    <td class="px-5 py-4 text-slate-600">
+                        {{ m.username }}
+                    </td>
+
+                    <td class="px-5 py-4 text-slate-600">
+                        {{ m.created_at.strftime('%d/%m/%Y %H:%M') }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="px-5 py-10 text-center text-slate-500">
+                        No hay movimientos recientes.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

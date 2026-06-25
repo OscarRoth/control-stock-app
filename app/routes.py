@@ -9,7 +9,8 @@ from flask import (
     url_for,
     session,
     Response,
-    current_app
+    current_app,
+    flash
 )
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -43,7 +44,11 @@ def login():
         auth_result = authenticate_ad(username, password)
 
         if not auth_result:
-            return "Usuario o contraseña inválidos, o usuario sin grupo autorizado"
+            flash(
+                "Usuario o contraseña inválidos, o usuario sin grupo autorizado.",
+                "error"
+            )
+            return redirect(url_for("main.login"))
 
         user = User(
             username=auth_result["username"],
@@ -64,24 +69,33 @@ def logout():
     logout_user()
     return redirect(url_for("main.login"))
 
-
 @bp.route("/")
 @login_required
 def home():
     products_count = Product.query.count()
     movements_count = Movement.query.count()
 
-    return render_template(
-        "base.html",
-        content=f"""
-        <h2>Inicio</h2>
-        <p>Usuario: {current_user.username}</p>
-        <p>Rol: {current_user.role}</p>
-        <p>Productos registrados: {products_count}</p>
-        <p>Movimientos registrados: {movements_count}</p>
-        """
-    )
+    stock_bajo_count = Product.query.filter(
+        Product.stock > 0,
+        Product.stock <= 5
+    ).count()
 
+    sin_stock_count = Product.query.filter(
+        Product.stock <= 0
+    ).count()
+
+    ultimos_movimientos = Movement.query.order_by(
+        Movement.created_at.desc()
+    ).limit(5).all()
+
+    return render_template(
+        "dashboard.html",
+        products_count=products_count,
+        movements_count=movements_count,
+        stock_bajo_count=stock_bajo_count,
+        sin_stock_count=sin_stock_count,
+        ultimos_movimientos=ultimos_movimientos
+    )
 
 @bp.route("/productos")
 @login_required
@@ -169,6 +183,12 @@ def historial():
 
     return render_template("historial.html", movements=movements)
 
+@bp.route("/usuarios")
+@login_required
+@require_role("admin")
+def usuarios():
+    return render_template("usuarios.html")
+
 @bp.route("/exportar/productos")
 @login_required
 @require_role("admin", "consulta")
@@ -206,3 +226,7 @@ def exportar_productos():
             "attachment; filename=productos.csv"
         }
     )
+
+@bp.app_errorhandler(403)
+def forbidden(error):
+    return render_template("403.html"), 403

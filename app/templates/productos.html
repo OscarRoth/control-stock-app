@@ -1,23 +1,114 @@
 {% extends "base.html" %}
+{% from "components.html" import button, stock_badge %}
+
+{% block title %}Productos | Control Stock{% endblock %}
+{% block page_title %}Productos{% endblock %}
+{% block page_subtitle %}Catálogo operativo de repuestos y stock disponible{% endblock %}
 
 {% block content %}
-<h2>Productos</h2>
 
-<table border="1" cellpadding="6">
-    <tr>
-        <th>ID</th>
-        <th>SKU</th>
-        <th>Nombre</th>
-        <th>Stock</th>
-    </tr>
+<section class="rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex flex-col justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center">
+        <div>
+            <h2 class="text-base font-semibold text-slate-900">Inventario</h2>
+            <p class="mt-1 text-sm text-slate-500">Productos registrados en el sistema</p>
+        </div>
 
-    {% for product in products %}
-    <tr>
-        <td>{{ product.id }}</td>
-        <td>{{ product.sku }}</td>
-        <td>{{ product.name }}</td>
-        <td>{{ product.stock }}</td>
-    </tr>
-    {% endfor %}
-</table>
+        <div class="flex flex-wrap gap-3">
+            {{ button("Exportar CSV", url_for("main.exportar_productos"), "secondary") }}
+            {% if current_user.can_manage_products %}
+            {{ button("Nuevo producto", url_for("main.nuevo_producto")) }}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">Producto</th>
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">SKU</th>
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">Inventario</th>
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">Estado</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-slate-100 bg-white">
+                {% for product in products %}
+                <tr class="hover:bg-slate-50">
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                                <span class="text-lg">▣</span>
+                            </div>
+
+                            <div>
+                                <div class="font-medium text-slate-900">
+                                    {{ product.name }}
+                                </div>
+                                <div class="mt-1 text-xs text-slate-500">
+                                    Producto activo en inventario
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td class="px-5 py-4">
+                        <span class="font-mono text-slate-700">
+                            {{ product.sku }}
+                        </span>
+                    </td>
+
+                    <td class="px-5 py-4">
+                        <div class="w-52">
+                            <div class="mb-1 flex items-center justify-between">
+                                <span class="text-xs font-medium text-slate-500">
+                                    Stock
+                                </span>
+                                <span class="text-xs font-semibold text-slate-900">
+                                    {{ product.stock }} unidades
+                                </span>
+                            </div>
+
+                            <div class="h-2 rounded-full bg-slate-200">
+
+                                {% if product.stock <= 0 %} <div class="h-2 w-0 rounded-full bg-red-600">
+                            </div>
+
+                            {% elif product.stock <= 5 %} <div class="h-2 rounded-full bg-amber-500" style="width:25%;">
+                        </div>
+
+                        {% elif product.stock <= 20 %} <div class="h-2 rounded-full bg-blue-600" style="width:60%;">
+    </div>
+
+    {% else %}
+    <div class="h-2 rounded-full bg-emerald-600" style="width:100%;"></div>
+
+    {% endif %}
+
+    </div>
+
+    <div class="mt-1 text-xs text-slate-500">
+
+        {% if product.stock <= 0 %} Sin disponibilidad {% elif product.stock <=5 %} Reposición sugerida {% elif
+            product.stock <=20 %} Stock medio {% else %} Stock saludable {% endif %} </div>
+            </td>
+
+            <td class="px-5 py-4">
+                {{ stock_badge(product.stock) }}
+            </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="px-5 py-10 text-center text-sm text-slate-500">
+                    No hay productos registrados.
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+    </div>
+</section>
+
 {% endblock %}

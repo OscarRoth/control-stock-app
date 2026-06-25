@@ -1,30 +1,160 @@
 {% extends "base.html" %}
+{% from "components.html" import badge %}
+
+{% block title %}Historial | Control Stock{% endblock %}
+{% block page_title %}Historial{% endblock %}
+{% block page_subtitle %}Auditoría de movimientos del inventario{% endblock %}
 
 {% block content %}
 
-<h2>Historial de Movimientos</h2>
+<section class="rounded-xl border border-slate-200 bg-white shadow-sm">
 
-<table border="1" cellpadding="5">
-    <tr>
-        <th>ID</th>
-        <th>Producto</th>
-        <th>Tipo</th>
-        <th>Cantidad</th>
-        <th>Usuario</th>
-        <th>Fecha</th>
-    </tr>
+    <div class="border-b border-slate-200 px-6 py-5">
+        <h2 class="text-base font-semibold text-slate-900">
+            Movimientos registrados
+        </h2>
 
-    {% for m in movements %}
-    <tr>
-        <td>{{ m.id }}</td>
-        <td>{{ m.product.name }}</td>
-        <td>{{ m.movement_type }}</td>
-        <td>{{ m.quantity }}</td>
-        <td>{{ m.username }}</td>
-        <td>{{ m.created_at }}</td>
-    </tr>
-    {% endfor %}
+        <p class="mt-1 text-sm text-slate-500">
+            Registro cronológico de ingresos y egresos.
+        </p>
+    </div>
 
-</table>
+    <div class="overflow-x-auto">
+
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+
+            <thead class="bg-slate-50">
+
+                <tr>
+
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">
+                        Producto
+                    </th>
+
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">
+                        Movimiento
+                    </th>
+
+                    <th class="px-5 py-3 text-center font-medium text-slate-500">
+                        Cantidad
+                    </th>
+
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">
+                        Usuario
+                    </th>
+
+                    <th class="px-5 py-3 text-left font-medium text-slate-500">
+                        Fecha
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody class="divide-y divide-slate-100 bg-white">
+
+                {% for m in movements %}
+
+                <tr class="hover:bg-slate-50">
+
+                    <td class="px-5 py-4">
+
+                        <div class="flex items-center gap-3">
+
+                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
+
+                                📦
+
+                            </div>
+
+                            <div>
+
+                                <div class="font-medium text-slate-900">
+
+                                    {{ m.product.name }}
+
+                                </div>
+
+                                <div class="text-xs text-slate-500">
+
+                                    ID {{ m.product.id }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                    <td class="px-5 py-4">
+
+                        {% if m.movement_type == "ingreso" %}
+                        {{ badge("Ingreso", "success") }}
+                        {% else %}
+                        {{ badge("Egreso", "danger") }}
+                        {% endif %}
+
+                    </td>
+
+                    <td class="px-5 py-4 text-center">
+
+                        <span class="font-semibold text-slate-900">
+
+                            {{ m.quantity }}
+
+                        </span>
+
+                    </td>
+
+                    <td class="px-5 py-4">
+
+                        <div class="font-medium">
+
+                            {{ m.username }}
+
+                        </div>
+
+                    </td>
+
+                    <td class="px-5 py-4">
+
+                        <div>
+
+                            {{ m.created_at.strftime('%d/%m/%Y') }}
+
+                        </div>
+
+                        <div class="text-xs text-slate-500">
+
+                            {{ m.created_at.strftime('%H:%M') }}
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+
+                    <td colspan="5" class="px-5 py-12 text-center text-slate-500">
+
+                        No existen movimientos registrados.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
 
 {% endblock %}

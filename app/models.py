@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from flask_login import UserMixin
+
 from . import db
 
 
@@ -20,13 +23,51 @@ class Movement(db.Model):
     username = db.Column(db.String(120), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-# se crea modelo usr (para conectar a Active Directory)
-from flask_login import UserMixin
-
 
 class User(UserMixin):
+    ROLE_LABELS = {
+        "admin": "Administrador",
+        "operador": "Operador",
+        "consulta": "Consulta",
+    }
+
     def __init__(self, username, role):
         self.id = username
         self.username = username
         self.role = role
-    
+
+    @property
+    def role_label(self):
+        return self.ROLE_LABELS.get(self.role, self.role)
+
+    @property
+    def is_admin(self):
+        return self.role == "admin"
+
+    @property
+    def is_operador(self):
+        return self.role == "operador"
+
+    @property
+    def is_consulta(self):
+        return self.role == "consulta"
+
+    @property
+    def can_manage_products(self):
+        return self.role == "admin"
+
+    @property
+    def can_move_stock(self):
+        return self.role in ("admin", "operador")
+
+    @property
+    def can_view_history(self):
+        return self.role in ("admin", "consulta")
+
+    @property
+    def can_manage_users(self):
+        return self.role == "admin"
+
+    @property
+    def can_export_products(self):
+        return self.role in ("admin", "consulta")
