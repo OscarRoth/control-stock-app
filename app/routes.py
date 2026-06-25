@@ -1,7 +1,3 @@
-
-
-
-
 from datetime import datetime
 import csv
 from io import StringIO
@@ -12,7 +8,8 @@ from flask import (
     redirect,
     url_for,
     session,
-    Response
+    Response,
+    current_app
 )
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -21,6 +18,7 @@ from .models import Product, Movement, User
 
 # permisos para diferentes usuarios
 from .permissions import require_role
+from .auth import authenticate_ad
 
 
 bp = Blueprint("main", __name__)
@@ -28,8 +26,10 @@ bp = Blueprint("main", __name__)
 
 def horario_permitido():
     hora = datetime.now().hour
-    return 8 <= hora < 18
+    inicio = current_app.config["LOGIN_START_HOUR"]
+    fin = current_app.config["LOGIN_END_HOUR"]
 
+    return inicio <= hora < fin
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -37,24 +37,25 @@ def login():
         if not horario_permitido():
             return "Acceso fuera de horario permitido"
 
-        username = request.form["username"]
+        username = request.form["username"].strip()
+        password = request.form["password"]
 
-        #condicionales para tipos de roles para el logueo
-        if username == "admin":
-            role = "admin"
-        elif username == "operador":
-            role = "operador"
-        else:
-            role = "consulta"
+        auth_result = authenticate_ad(username, password)
 
-        user = User(username=username, role=role)
-        session["role"] = role
+        if not auth_result:
+            return "Usuario o contraseña inválidos, o usuario sin grupo autorizado"
+
+        user = User(
+            username=auth_result["username"],
+            role=auth_result["role"]
+        )
+
+        session["role"] = auth_result["role"]
         login_user(user)
 
         return redirect(url_for("main.home"))
 
     return render_template("login.html")
-
 
 @bp.route("/logout")
 @login_required
@@ -121,8 +122,6 @@ def nuevo_producto():
 def movimientos():
     if request.method == "POST":
         product_id = int(request.form["product_id"])
-
-
         movement_type = request.form["movement_type"]
         quantity = int(request.form["quantity"])
 
