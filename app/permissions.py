@@ -1,8 +1,6 @@
 from functools import wraps
 
-from flask import flash
-from flask import redirect
-from flask import url_for
+from flask import abort
 
 from flask_login import current_user
 
@@ -16,12 +14,8 @@ def require_role(*roles):
 
             if current_user.role not in roles:
 
-                flash(
-                    "No posee permisos para acceder a esta funcionalidad.",
-                    "warning"
-                )
-
-                return redirect(url_for("main.home"))
+                if current_user.role not in roles:
+                    abort(403)
 
             return func(*args, **kwargs)
 
