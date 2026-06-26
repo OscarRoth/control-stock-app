@@ -14,6 +14,11 @@ class Config:
 
     DEV_LOGIN = os.getenv("DEV_LOGIN", "false").lower() == "true"
 
+    # operador acceso temporal
+    OPERADOR_TEMP_ACCESS = (
+        os.getenv("OPERADOR_TEMP_ACCESS", "false").lower() == "true"
+    )
+    
     # Active Directory
     AD_SERVER = os.getenv("AD_SERVER")
     AD_DOMAIN = os.getenv("AD_DOMAIN")

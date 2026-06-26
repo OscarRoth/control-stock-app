@@ -10,17 +10,26 @@ def authenticate_ad(username, password):
     ad_domain = current_app.config["AD_DOMAIN"]
     base_dn = current_app.config["AD_BASE_DN"]
 
-    user_login = f"{username}@{ad_domain}"
+    domain_netbios = ad_domain.split(".")[0]
+    user_login = f"{domain_netbios}\\{username}"
 
     try:
+        print("LDAP SERVER:", ad_server)
+        print("LDAP USER:", user_login)
+        print("LDAP BASE DN:", base_dn)
+
         server = Server(ad_server, get_info=ALL)
 
         conn = Connection(
             server,
             user=user_login,
             password=password,
-            auto_bind=True
+            raise_exceptions=False
         )
+
+        if not conn.bind():
+            print("LDAP BIND FAILED:", conn.result)
+            return None
 
         conn.search(
             search_base=base_dn,
@@ -30,6 +39,7 @@ def authenticate_ad(username, password):
         )
 
         if not conn.entries:
+            print("LDAP SEARCH: usuario no encontrado:", username)
             conn.unbind()
             return None
 
@@ -41,9 +51,13 @@ def authenticate_ad(username, password):
 
         role = get_role_from_groups(groups)
 
+        print("LDAP GROUPS:", groups)
+        print("LDAP ROLE:", role)
+
         conn.unbind()
 
         if not role:
+            print("LDAP ROLE ERROR: usuario autenticado pero sin grupo autorizado")
             return None
 
         return {
@@ -63,13 +77,13 @@ def get_role_from_groups(groups):
     consulta_group = current_app.config["AD_GROUP_CONSULTA"]
 
     for group in groups:
-        if admin_group in group:
+        if admin_group and admin_group in group:
             return "admin"
 
-        if operador_group in group:
+        if operador_group and operador_group in group:
             return "operador"
 
-        if consulta_group in group:
+        if consulta_group and consulta_group in group:
             return "consulta"
 
     return None

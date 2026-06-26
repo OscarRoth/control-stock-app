@@ -35,9 +35,11 @@ def horario_permitido():
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        if not horario_permitido():
-            return "Acceso fuera de horario permitido"
 
+        #if not horario_permitido():
+        #    flash("Acceso fuera del horario permitido.", "warning")
+        #    return redirect(url_for("main.login"))
+         
         username = request.form["username"].strip()
         password = request.form["password"]
 
@@ -45,11 +47,11 @@ def login():
 
         if not auth_result:
             flash(
-                "Usuario o contraseña inválidos, o usuario sin grupo autorizado.",
+                "No se pudo iniciar sesión. Verifique usuario, contraseña, grupo autorizado u horario permitido por Active Directory.",
                 "error"
             )
             return redirect(url_for("main.login"))
-
+        
         user = User(
             username=auth_result["username"],
             role=auth_result["role"]
